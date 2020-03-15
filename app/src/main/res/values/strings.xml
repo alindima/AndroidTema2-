@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Tema2</string>
+    <string name="nameEditHint">Name</string>
+    <string name="gradeEditHint">Grade</string>
+
+    <string name="addButtonText">Add user</string>
+    <string name="removeButtonText">Delete user</string>
+
+</resources>
