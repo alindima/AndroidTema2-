@@ -1,6 +1,8 @@
 package com.example.tema2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter mAdapter;
+
     private UserRepository mUserRepository;
 
     @Override
@@ -31,6 +36,24 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("Users");
 
+        recyclerView = findViewById(R.id.list);
+        recyclerView.setHasFixedSize(true);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        performRefresh();
+    }
+
+    public void performRefresh() {
+        mUserRepository.getUsersTask(new OnGetUsersActionListener() {
+            @Override
+            public void actionSuccess(List<User> users) {
+                mAdapter = new UserListAdapter(users);
+                recyclerView.setAdapter(mAdapter);
+
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void onAdd(View view) {
@@ -56,14 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 nameEdit.setText("");
                 gradeEdit.setText("");
 
-                mUserRepository.getUsersTask(new OnGetUsersActionListener() {
-                    @Override
-                    public void actionSuccess(List<User> users) {
-                        for (User user : users){
-                            Log.println(Log.DEBUG, "users", user.name + " " + user.grade);
-                        }
-                    }
-                });
+                performRefresh();
             }
         });
     }
@@ -81,14 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 nameEdit.setText("");
 
                 if(result){
-                    mUserRepository.getUsersTask(new OnGetUsersActionListener() {
-                        @Override
-                        public void actionSuccess(List<User> users) {
-                            for (User user : users){
-                                Log.println(Log.DEBUG, "users", user.name);
-                            }
-                        }
-                    });
+                    performRefresh();
                 }else{
                     Toast toast = Toast.makeText(getApplicationContext(),
                             "No user matches this name", Toast.LENGTH_SHORT);
